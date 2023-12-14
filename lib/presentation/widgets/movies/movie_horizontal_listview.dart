@@ -1,7 +1,9 @@
 //import 'package:animate_do/animate_do.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 
 //import '../../../config/helpers/human_formats.dart';
+import '../../../config/helpers/human_formats.dart';
 import '../../../domain/entities/movie.dart';
 
 class MovieHorizontalListview extends StatelessWidget {
@@ -28,35 +30,86 @@ class MovieHorizontalListview extends StatelessWidget {
            if ( title != null || subTitle != null )
             _Title(title: title, subTitle: subTitle ),
 
-            // ListView.builder(
-            //   itemCount: movies.length,
-            //   scrollDirection: Axis.horizontal,
-            //   physics: const BouncingScrollPhysics(),
-            //   itemBuilder: (context, index) => _Slide(movie: movies[index])
-            // )
+            Expanded(
+              child: ListView.builder(
+                itemCount: movies.length,
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                itemBuilder: (context, index) => _Slide(movie: movies[index])
+              ),
+            )
         ],
       ),
     );
   }
 }
 
-// class _Slide extends StatelessWidget {
+class _Slide extends StatelessWidget {
 
-//   final Movie movie;
+  final Movie movie;
 
-//   const _Slide({ required this.movie });
+  const _Slide({ required this.movie });
 
-//   @override
-//   Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
 
-//     //final textStyles = Theme.of(context).textTheme;
+    final textStyles = Theme.of(context).textTheme;
 
-//     return Container(
-//       margin: const EdgeInsets.symmetric( horizontal: 8),
-//       child: const Placeholder()
-//     );
-//   }
-// }
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          //* Imagen
+          SizedBox(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Image.network(
+                movie.posterPath,
+                fit: BoxFit.cover,
+                width: 150,
+                loadingBuilder: (context, child, loadingProgress){
+                  if( loadingProgress != null ){
+                    return const CircularProgressIndicator(strokeWidth: 2,);
+                  }
+                  return FadeIn(child: child);
+                },
+              ),
+            ),
+          ),
+          
+          const SizedBox( height: 5,),
+
+          //* Title
+          SizedBox(
+            width: 150,
+            child: Text(
+              movie.title,
+              maxLines: 2,
+              style: textStyles.titleSmall,
+            ),
+          ),
+
+          //* Rating
+          SizedBox(
+            width: 150,
+            child: Row(
+              children: [
+                Icon( Icons.star_half_outlined, color: Colors.yellow.shade800 ),
+                const SizedBox( width: 3 ),
+                Text('${ movie.voteAverage }', style: textStyles.bodyMedium?.copyWith( color: Colors.yellow.shade800 )),
+                const Spacer(),
+                Text( HumanFormats.number(movie.popularity), style: textStyles.bodySmall ),
+              ],
+            ),
+          )
+
+        ],
+      ),
+    );
+  }
+}
 
 class _Title extends StatelessWidget {
 
